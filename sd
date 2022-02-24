@@ -139,9 +139,11 @@ __sd_new() {
 
   mkdir -p "$(dirname "$script")"
   cat > "$script" <<EOF
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-set -euo pipefail
+# SCRIPT-EXPLANATION-HERE
+set -eu
+IFS=$'\n\t'
 $body
 EOF
 
