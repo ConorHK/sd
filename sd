@@ -168,7 +168,6 @@ __sd_new() {
       printf "\n%s\n" "$body"
     fi
   ) >"$script"
-
   chmod +x "$script"
 
   if [[ -z "$body" ]]; then
