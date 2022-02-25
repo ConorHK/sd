@@ -240,19 +240,26 @@ sd() (
   fi
 )
 
-# If you source this file, it will define the function sd,
-# which you can use from your shell. If you *run* this file
-# as an executable, it will just invoke that function. We
-# have to do some tricks to detect that reliably on bash/zsh.
-
 if [[ -n ${ZSH_EVAL_CONTEXT+x} ]]; then
   # we are in zsh
   if [[ "$ZSH_EVAL_CONTEXT" = toplevel ]]; then
     sd "$@"
+  else
+    local target=${SD_ROOT:-$HOME/sd}
+    mkdir -p $target/.scripts
+    find "$target/" -type f -executable -exec sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
+    path+=("$target/.scripts")
+    export PATH
   fi
 elif [[ -n ${BASH_SOURCE[0]+x} ]]; then
   # we are in bash
   if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     sd "$@"
+  else
+    local target=${SD_ROOT:-$HOME/sd}
+    mkdir -p $target/.scripts
+    find "$target/" -type f -executable -exec sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
+    export PATH="$PATH:$target/.scripts"
   fi
+
 fi
