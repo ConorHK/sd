@@ -1,4 +1,9 @@
 # `sd`: my `s`cript `d`irectory
+## Fork changes:
+* Made POSIX compliant
+* Added PKGBUILD for installation (run with `makepkg -f --install`)
+* Added .scripts dir that contains symbolic links to all scripts with the prefix "sd-". This allows easy script usage, e.g `sd-docked` instead of `sd wm docked`. Makes for easy killing of processes, debugging etc.
+---
 
 Has this ever happened to you?
 
