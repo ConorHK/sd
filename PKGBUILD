@@ -11,7 +11,7 @@ provides=("sd")
 conflicts=("sd")
 source=("sd" "_sd")
 sha256sums=('630cdcc88f2c212d6f8f3375ad2b0d9e851e69860dc8ebb8f94f8d2ee47f660b'
-            '3188a4352f2cd613fbb86aaf160fbe716c623b2d01839778c646fa3e44d8b828')
+            'd4efc559a6a48dab211954c189ef415dd2f44314f71b4c0c2a59d7dda2ca333f')
 
 package() {
   install -D "${srcdir}/${pkgname}" -t "${pkgdir}/usr/bin"
