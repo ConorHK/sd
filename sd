@@ -269,7 +269,7 @@ if [[ -n ${ZSH_EVAL_CONTEXT+x} ]]; then
   else
     local target=${SD_ROOT:-$HOME/sd}
     mkdir -p $target/.scripts
-    find "$target/" -type f -perm -ugo=x sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
+    find "$target/" -type f -perm -ugo=x -exec sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
     path+=("$target/.scripts")
     export PATH
   fi
@@ -279,7 +279,8 @@ elif [[ -n ${BASH_SOURCE[0]+x} ]]; then
     __sd "$@"
   else
     local target=${SD_ROOT:-$HOME/sd}
-    find "$target/" -type f -perm -ugo=x sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
+    find "$target/" -type f -perm -ugo=x -exec sh -c 'ln -sf "$1" $SD_ROOT/.scripts/sd-$(basename "$1")' sh {} \;
     export PATH="$PATH:$target/.scripts"
   fi
+
 fi
