@@ -10,7 +10,7 @@ depends=("pacman>=4.1.2" "git" "bash")
 provides=("sd")
 conflicts=("sd")
 source=("sd" "_sd")
-sha256sums=('52c98c488acfefee67e1a4126992667c58a15fa36638d8329e165803f700382d'
+sha256sums=('f7f756af1b88a593be47589f9cc92b5965a1a9fd2e649179cac1b258851f040a'
             'd4efc559a6a48dab211954c189ef415dd2f44314f71b4c0c2a59d7dda2ca333f')
 
 package() {

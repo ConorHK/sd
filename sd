@@ -118,8 +118,9 @@ __sd_print_template() {
 #!/usr/bin/env sh
 
 # SCRIPTDESCRIPTION
-set -eu
-IFS=$'\n\t'
+set -o errexit
+set -o nounset
+IFS=$(printf '\n\t')
 EOF
     else
       __sd_print_template "$(dirname "$1")"
