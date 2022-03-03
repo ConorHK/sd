@@ -5,7 +5,7 @@ pkgrel=1
 pkgdesc="script directory"
 arch=("any")
 url="https://github.com/ConorHK/sd"
-license=("unknown")
+license=("MIT")
 depends=("pacman>=4.1.2" "git" "bash")
 provides=("sd")
 conflicts=("sd")
