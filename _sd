@@ -9,7 +9,7 @@ function __list_commands {
   # - follow symlinks
   # , "or" separator
   # / directories
-  for file in "$dir"/*(-*,/); do
+  for file in "$dir"/*(-*,/,-); do
     command=$(basename "$file")
 
     if [[ -d "$file" ]]; then
