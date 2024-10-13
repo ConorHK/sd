@@ -1,5 +1,5 @@
 {
-  description = "A flake to package the sd tool";
+  description = "conorhk's fork of ianthehenry's script-directory tool";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
@@ -10,15 +10,14 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs { inherit system; };
     in {
-      # Define the sd package for the current system
       packages = {
         default = pkgs.stdenv.mkDerivation {
-          pname = "sd";
+          pname = "script-directory";
           version = "1.0.0";
           src = ./.;
           installPhase = ''
             mkdir -p $out/bin
-            cp ./sd $out/bin/sd
+            cp ./script $out/bin/sd
             chmod +x $out/bin/sd
           '';
         };
