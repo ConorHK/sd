@@ -99,7 +99,7 @@ __sd_help() {
   elif [[ -f "$target.help" ]]; then
     __sd_cat "$target.help"
   else
-    help=$(sed -nE -e '/^#!/d' -e $':start\n /^#/{ s/^# ?//; p; \nb start\n }' "$target")
+    help=$(sed -nE -e '/^#!/d' -e $':start\n/^#/{ s/^# ?//; p; n; /^#/!q; b start\n}' "$target")
     if [[ -z "$help" ]]; then
       echo "there is no help for you here" >&2
       exit 1
@@ -176,10 +176,32 @@ __sd_new() {
   fi
 }
 
+__sd_new_user_help() {
+  root=$1
+  echo >&2 "error: $root not found"
+  echo >&2
+  echo >&2 "It looks like you don't have a script directory yet!"
+  echo >&2
+  echo >&2 "Get started by creating your first script:"
+  echo >&2
+  echo >&2 "    sd hello --new 'echo \"Hello, sd!\"'"
+  echo >&2
+  echo >&2 "And then run it like this:"
+  echo >&2
+  echo >&2 "    sd hello"
+}
+
 __sd() {
   set -euo pipefail
 
-  local target=${SD_ROOT:-$HOME/sd}
+  local root=${SD_ROOT:-$HOME/sd}
+
+  if [[ -e "$root" && ! -d "$root" ]]; then
+    echo "error: $root is not a directory" >&2
+    exit 1
+  fi
+
+  local target=$root
   local arg
 
   while [[ $# -gt 0 ]]; do
@@ -214,6 +236,15 @@ __sd() {
     esac
   done
 
+  # you're allowed to run --new even if there is no
+  # script directory root, in order to bootstrap it
+  if [[ "$found_really" = "true" || "$found_new" = "false" ]]; then
+    if [[ ! -d "$root" ]]; then
+        __sd_new_user_help "$root"
+        exit 1
+      fi
+  fi
+
   if [[ "$found_really" = "true" ]]; then
     local -a preserved=()
     for arg in "$@"; do
@@ -225,11 +256,11 @@ __sd() {
     if [[ ${#preserved[@]} -gt 0 ]]; then
       set -- "${preserved[@]}" "$@"
     fi
-  elif [[ "$found_help" = "true" ]]; then
-    __sd_help "$target"
-    exit 0
   elif [[ "$found_new" = "true" ]]; then
     __sd_new "$target" "$@"
+    exit 0
+  elif [[ "$found_help" = "true" ]]; then
+    __sd_help "$target"
     exit 0
   elif [[ "$found_edit" = "true" ]]; then
     __sd_edit "$target"

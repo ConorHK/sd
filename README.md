@@ -5,6 +5,10 @@
 * Added .scripts dir that contains symbolic links to all scripts with the prefix "sd-". This allows easy script usage, e.g `sd-docked` instead of `sd wm docked`. Makes for easy killing of processes, debugging etc.
 ---
 
+- [Usage](#usage)
+- [Installation](#installation)
+- [Changelog](#changelog)
+
 Has this ever happened to you?
 
 *Black and white video plays of someone struggling to find a shell script they wrote a year ago and stuffed into their `~/bin` without giving it a very meaningful name.*
@@ -211,11 +215,67 @@ There are two ways to use `sd`:
 
 I prefer to use `sd` as a regular executable, but the function approach is more convenient if you already use a shell plugin manager that knows how to set up `fpath` automatically.
 
-Note that you cannot invoke "recursive `sd`" (that is, write scripts that themselves invoke `sd`) if you use the function approach. This includes all of the helper scripts in `sdefaults/` (explained below).
+Note that you cannot invoke "recursive `sd`" (that is, write scripts that themselves invoke `sd`) if you use the function approach, unless you're writing zsh scripts. But you probably shouldn't.
 
-## Installation as a shell function
+## Installation as a regular script
 
-You can just source `sd` in your `.zshrc` and set up completion manually (as described below), but `sd` is designed to be compatible with shell plugin managers.
+## Using Nix
+
+As far as I know, [Nix](https://search.nixos.org/packages?channel=unstable&query=script-directory) is the only package manager with `sd` pre-packaged (as `nixpkgs.script-directory`).
+
+`sd` is also [available in home manager](https://github.com/nix-community/home-manager/blob/master/modules/programs/script-directory.nix). You can install it by adding something like this to your `~/.config/home-manager/home.nix`:
+
+```nix
+{...}: {
+  home.programs.script-directory = {
+    script-directory = {
+      enable = true;
+      settings = {
+        # SD_ROOT = "${config.home.homeDirectory}/custom-script-directory";
+        # SD_EDITOR = "vim";
+        # SD_CAT = "bat";
+      };
+    };
+  };
+  
+  home.programs.zsh = {
+    # The script-directory module doesn't automatically configure
+    # zsh completion, so we still have manually add this:
+  
+    initExtra = ''
+    fpath+="${pkgs.script-directory}/share/zsh/site-functions"
+    '';
+  };
+}
+```
+
+## Without a package manager
+
+1. Put the `sd` script somewhere on your `PATH`.
+2. Put the `_sd` completion script somewhere on your `fpath`.
+
+I like to symlink `sd` to `~/bin`, which is already on my path. If you've cloned this repo to `~/src/sd`, you can do that by running something like:
+
+    $ ln -s ~/src/sd/sd ~/bin/sd
+
+There isn't really a standard place in your home directory to put completion scripts, so unless you've made your own, you'll probably want to add your clone directly to your `fpath`. You should add that to your `.zshrc` file before the line where you call `compinit`. It should look something like this:
+
+    # ~/.zshrc
+
+    fpath=(~/src/sd $fpath)
+    autoload -U compinit
+    compinit
+
+If you use a zsh framework like [`oh-my-zsh`](https://github.com/ohmyzsh/ohmyzsh), it probably calls `compinit` for you. In that case, just set your `fpath` before you source the framework's initialization script.
+
+Note that changes you make to your `~/.zshrc` will only take effect for *future* shells you create, so to start enjoying `sd` immediately you'll also want to run these commands in your existing shells:
+
+    $ fpath=(~/src/sd $fpath)
+    $ compinit
+
+## As a shell function
+
+You can just source `sd` in your `.zshrc` and set up completion manually (as described [above](#installation-as-a-regular-script)), but `sd` is designed to be compatible with shell plugin managers.
 
 ### [Antigen](https://github.com/zsh-users/antigen)
 
@@ -240,35 +300,23 @@ plugins+=(sd)
 source "$ZSH/oh-my-zsh.sh"
 ```
 
-## Installation as a regular script
+# bash/fish autocompletion support
 
-`sd` is not currently packaged in any package manager that I am aware of, but it should be pretty easy if you want to package it for your distribution. It's just a single script and a single completion file. Until that day:
+Patrick Jackson contributed [an unofficial fish completion script](https://gist.github.com/patricksjackson/5065e4a9d8e825dafc7824112f17a5e6), which should be usable with some modification (as written it does not respect `SD_ROOT`, but it should act as a very good starting point if you use fish).
 
-- Put the `sd` script somewhere on your path.
+Bash doesn't support the fancy completion-with-description feature that is sort of the whole point of `sd`, but there are apparently ways to hack something similar.
 
-I like to symlink it to `~/bin`, which is already on my path. If you've cloned this repo to `~/src/sd`, run something like:
-
-    $ ln -s ~/src/sd/sd ~/bin/sd
-
-- Put `_sd` somewhere on your `fpath`.
-
-If you've cloned this repo to `~/src/sd`, add something like this to your `~/.zshrc` file:
-
-```shell
-fpath=(~/src/sd $fpath)
-```
-
-## `sd help command` vs. `sd command --help`
-
-There are some scripts in `sdefaults/` that you can copy into your own `~/sd` if you like. They'll let you type `sd cat foo bar` instead of `sd foo bar --cat` or `sd new foo -- echo hi` instead of `sd foo --new echo hi` (and so on for each of the built-in commands).
-
-These mostly exist for backwards compatibility with an earlier version of `sd`. You don't have to use them if you don't want to. Note that they will not work if you've installed `sd` as a shell function instead of an executable.
-
-# bash support
-
-Bash doesn't support the fancy completion-with-description feature that is sort of the whole point of `sd`, so I didn't bother to write bash completion. If you're using bash: I'm very sorry. You *can* still use `sd`, it just... won't be quite as useful.
 
 # Changelog
+
+## v1.1.0 2022-10-30
+
+- fix a bug where `--help` would print every comment in the script
+
+## v1.0.1 2022-04-17
+
+- better error message if `~/sd` does not exist
+- better error message if `~/sd` exists but is not a directory
 
 ## v1.0.0 2022-02-27
 
