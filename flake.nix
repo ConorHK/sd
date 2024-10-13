@@ -17,7 +17,7 @@
           src = ./.;
           installPhase = ''
             mkdir -p $out/bin
-            cp ./script $out/bin/sd
+            cp ./sd $out/bin/sd
             chmod +x $out/bin/sd
           '';
         };
