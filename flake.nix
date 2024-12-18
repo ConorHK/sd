@@ -22,6 +22,7 @@
         version = "1.1.0";
         src = ./.;
 
+        nativeBuildInputs = [installShellFiles];
         phases = ["installPhase" "postInstall" ];
 
         installPhase = ''
