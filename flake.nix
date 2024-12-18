@@ -3,40 +3,52 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs { inherit system; };
-    in {
-      packages = {
-        default = pkgs.stdenvNoCC.mkDerivation rec {
-          pname = "script-directory";
-          version = "1.1.0";
-          src = ./.;
+  outputs = {self, nixpkgs, ... }:
+    let
+    supportedSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin"];
+  forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+  nixpkgsFor = forAllSystems (system:
+      import nixpkgs {
+      inherit system;
+      overlays = [self.overlay];
+      });
+  in {
+    overlay = final: _prev: {
+      sd = with final;
+      stdenv.mkDerivation rec {
+        pname = "script-directory";
+        version = "1.1.0";
+        src = ./.;
 
-          nativeBuildInputs = [
-            pkgs.installShellFiles
+        nativeBuildInputs = [
+          pkgs.installShellFiles
             pkgs.patsh
-          ];
+        ];
 
-          installPhase = ''
-            runHook preInstall
-            patsh -f sd
-            install -Dt "$out/bin" sd
-            installShellCompletion --zsh _sd
-            runHook postInstall
+        phases = ["installPhase" ];
+
+        installPhase = ''
+          runHook preInstall
+          patsh -f sd
+          install -Dt "$out/bin" sd
+          installShellCompletion --zsh _sd
+          runHook postInstall
           '';
 
-          meta = {
-            description = "A cozy nest for your scripts";
-            homepage = "https://github.com/conorhk/sd";
-            changelog = "https://github.com/conorhk/sd/tree/${src.rev}#changelog";
-            license = pkgs.lib.licenses.mit;
-            mainProgram = "sd";
-          };
+        meta = {
+          description = "A cozy nest for your scripts";
+          homepage = "https://github.com/conorhk/sd";
+          changelog = "https://github.com/conorhk/sd/tree/${src.rev}#changelog";
+          license = pkgs.lib.licenses.mit;
+          mainProgram = "sd";
+        };
       };
     };
-  });
+
+    packages = forAllSystems (system: {
+        inherit (nixpkgsFor.${system}) sd;
+        });
+  };
 }
