@@ -22,20 +22,17 @@
         version = "1.1.0";
         src = ./.;
 
-        nativeBuildInputs = [
-          pkgs.installShellFiles
-            pkgs.patsh
-        ];
-
-        phases = ["installPhase" ];
+        phases = ["installPhase" "postInstall" ];
 
         installPhase = ''
-          runHook preInstall
-          patsh -f sd
-          install -Dt "$out/bin" sd
+          mkdir -p $out/bin
+          cp $src/sd $out/bin/sd
+          chmod +x $out/bin/sd
+        '';
+
+        postInstall = ''
           installShellCompletion --zsh _sd
-          runHook postInstall
-          '';
+        '';
 
         meta = {
           description = "A cozy nest for your scripts";
