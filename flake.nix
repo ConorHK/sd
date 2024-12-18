@@ -32,7 +32,7 @@
         '';
 
         postInstall = ''
-          installShellCompletion --zsh _sd
+          installShellCompletion --zsh $src/_sd
         '';
 
         meta = {
