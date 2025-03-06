@@ -182,13 +182,8 @@ __sd_new_user_help() {
   echo >&2
   echo >&2 "It looks like you don't have a script directory yet!"
   echo >&2
-  echo >&2 "Get started by creating your first script:"
-  echo >&2
-  echo >&2 "    sd hello --new 'echo \"Hello, sd!\"'"
-  echo >&2
-  echo >&2 "And then run it like this:"
-  echo >&2
-  echo >&2 "    sd hello"
+  echo >&2 "Installing github:conorhk/scripts"
+  git clone git@github.com:conorhk/scripts.git "$root"
 }
 
 __sd() {
